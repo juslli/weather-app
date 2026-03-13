@@ -1,17 +1,28 @@
-🌦 Weather App Pro
+# Weather App
 
-Aplicação que consulta clima em tempo real utilizando API.
+Aplicação de clima desenvolvida para consultar dados em tempo real e exibir temperatura e condições do tempo em uma interface moderna e interativa.
 
-Tecnologias:
+## 🚀 Tecnologias
 - HTML
 - CSS
 - JavaScript
-- API Weather
+- API de clima
 
-Funcionalidades:
-✔ Busca de cidades
-✔ Temperatura atual
-✔ Sensação térmica
-✔ Umidade
-✔ Velocidade do vento
-✔ Hora local
+## 🎯 O que pratiquei
+- Consumo de API
+- Manipulação do DOM
+- Tratamento de dados da requisição
+- Interface dinâmica
+- Organização de layout responsivo
+
+## 🔗 Projeto online
+[Ver projeto](https://juslli.github.io/weather-app/)
+
+## 💻 Repositório
+[Ver código](https://github.com/juslli/weather-app)
+
+## 📚 Aprendizados
+Esse projeto me ajudou a praticar integração com API, leitura de dados e atualização da interface com informações em tempo real.
+
+---
+Feito por **Junio Dias Gianelli**
