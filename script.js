@@ -34,6 +34,7 @@ async function buscarClima() {
   try {
     mostrarLoading(true);
     mostrarMensagem("");
+    weatherBox.classList.add("hidden");
 
     const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=pt&format=json`;
     const geoResponse = await fetch(geoUrl);
@@ -68,7 +69,7 @@ async function buscarClima() {
     windEl.textContent = `${Math.round(current.wind_speed_10m)} km/h`;
     feelsLikeEl.textContent = `${Math.round(current.apparent_temperature)}°C`;
     humidityEl.textContent = `${current.relative_humidity_2m}%`;
-    localTimeEl.textContent = formatarDataHora(weatherData.current.time);
+    localTimeEl.textContent = formatarDataHora(current.time);
 
     atualizarBackground(current.weather_code);
 
@@ -111,36 +112,27 @@ function getWeatherInfo(code) {
     1: { text: "Principalmente limpo", icon: "🌤️" },
     2: { text: "Parcialmente nublado", icon: "⛅" },
     3: { text: "Nublado", icon: "☁️" },
-
     45: { text: "Névoa", icon: "🌫️" },
     48: { text: "Névoa intensa", icon: "🌫️" },
-
     51: { text: "Garoa leve", icon: "🌦️" },
     53: { text: "Garoa moderada", icon: "🌦️" },
     55: { text: "Garoa forte", icon: "🌧️" },
-
     56: { text: "Garoa congelante leve", icon: "🌨️" },
     57: { text: "Garoa congelante forte", icon: "🌨️" },
-
     61: { text: "Chuva leve", icon: "🌧️" },
     63: { text: "Chuva moderada", icon: "🌧️" },
     65: { text: "Chuva forte", icon: "🌧️" },
-
     66: { text: "Chuva congelante leve", icon: "🌨️" },
     67: { text: "Chuva congelante forte", icon: "🌨️" },
-
     71: { text: "Neve leve", icon: "❄️" },
     73: { text: "Neve moderada", icon: "❄️" },
     75: { text: "Neve forte", icon: "❄️" },
     77: { text: "Grãos de neve", icon: "❄️" },
-
     80: { text: "Pancadas leves", icon: "🌦️" },
     81: { text: "Pancadas moderadas", icon: "🌧️" },
     82: { text: "Pancadas fortes", icon: "⛈️" },
-
     85: { text: "Pancadas de neve leves", icon: "🌨️" },
     86: { text: "Pancadas de neve fortes", icon: "🌨️" },
-
     95: { text: "Trovoada", icon: "⛈️" },
     96: { text: "Trovoada com granizo leve", icon: "⛈️" },
     99: { text: "Trovoada com granizo forte", icon: "⛈️" },
