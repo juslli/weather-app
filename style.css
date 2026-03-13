@@ -108,8 +108,12 @@ h1 {
 }
 
 .search-box button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(255, 31, 90, 0.3);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 24px rgba(255, 31, 90, 0.35);
+}
+
+.search-box button:active {
+  transform: scale(0.98);
 }
 
 .message {
@@ -127,6 +131,7 @@ h1 {
   padding: 14px;
   margin-bottom: 16px;
   color: #d9d9e5;
+  animation: pulse 1s infinite ease-in-out;
 }
 
 .hidden {
@@ -135,6 +140,7 @@ h1 {
 
 .weather-box {
   margin-top: 12px;
+  animation: fadeUp 0.45s ease;
 }
 
 .main-weather {
@@ -147,11 +153,13 @@ h1 {
   justify-content: space-between;
   margin-bottom: 16px;
   gap: 16px;
+  box-shadow: 0 0 20px rgba(255, 77, 121, 0.08);
 }
 
 .main-weather h2 {
-  font-size: 2rem;
+  font-size: clamp(1.4rem, 3vw, 2rem);
   margin-bottom: 8px;
+  line-height: 1.1;
 }
 
 .weather-description {
@@ -163,7 +171,7 @@ h1 {
 }
 
 #weatherIcon {
-  font-size: 1.6rem;
+  font-size: 1.8rem;
 }
 
 .temperature {
@@ -183,7 +191,8 @@ h1 {
   background: linear-gradient(145deg, #14182e, #101325);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 18px;
-  padding: 18px;
+  padding: 20px;
+  animation: fadeUp 0.45s ease;
 }
 
 .info-card span {
@@ -196,6 +205,29 @@ h1 {
 .info-card strong {
   font-size: 1.6rem;
   color: white;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
 }
 
 @media (max-width: 520px) {
@@ -221,7 +253,7 @@ h1 {
   }
 
   .main-weather h2 {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
   }
 
   .info-grid {
