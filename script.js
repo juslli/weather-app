@@ -1,129 +1,170 @@
 const cityInput = document.getElementById("cityInput");
 const searchBtn = document.getElementById("searchBtn");
+const weatherBox = document.getElementById("weatherBox");
+const loading = document.getElementById("loading");
 const message = document.getElementById("message");
-const weatherResult = document.getElementById("weatherResult");
+const background = document.querySelector(".background");
 
-const cityName = document.getElementById("cityName");
-const weatherDescription = document.getElementById("weatherDescription");
-const temperature = document.getElementById("temperature");
-const windSpeed = document.getElementById("windSpeed");
-const apparentTemp = document.getElementById("apparentTemp");
-const humidity = document.getElementById("humidity");
-const timeNow = document.getElementById("timeNow");
+const cityNameEl = document.getElementById("cityName");
+const weatherIconEl = document.getElementById("weatherIcon");
+const weatherTextEl = document.getElementById("weatherText");
+const temperatureEl = document.getElementById("temperature");
+const windEl = document.getElementById("wind");
+const feelsLikeEl = document.getElementById("feelsLike");
+const humidityEl = document.getElementById("humidity");
+const localTimeEl = document.getElementById("localTime");
 
-function translateWeatherCode(code) {
-  const weatherCodes = {
-    0: "Céu limpo",
-    1: "Principalmente limpo",
-    2: "Parcialmente nublado",
-    3: "Nublado",
-    45: "Névoa",
-    48: "Névoa com geada",
-    51: "Garoa leve",
-    53: "Garoa moderada",
-    55: "Garoa intensa",
-    56: "Garoa congelante leve",
-    57: "Garoa congelante intensa",
-    61: "Chuva fraca",
-    63: "Chuva moderada",
-    65: "Chuva forte",
-    66: "Chuva congelante leve",
-    67: "Chuva congelante forte",
-    71: "Neve fraca",
-    73: "Neve moderada",
-    75: "Neve forte",
-    77: "Grãos de neve",
-    80: "Pancadas de chuva fracas",
-    81: "Pancadas de chuva moderadas",
-    82: "Pancadas de chuva fortes",
-    85: "Pancadas de neve fracas",
-    86: "Pancadas de neve fortes",
-    95: "Trovoada",
-    96: "Trovoada com granizo leve",
-    99: "Trovoada com granizo forte"
-  };
+searchBtn.addEventListener("click", buscarClima);
 
-  return weatherCodes[code] || "Clima indisponível";
-}
-
-function showMessage(text) {
-  message.textContent = text;
-}
-
-async function getCoordinates(city) {
-  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=pt&format=json`;
-
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error("Erro ao buscar cidade.");
+cityInput.addEventListener("keypress", function (e) {
+  if (e.key === "Enter") {
+    buscarClima();
   }
+});
 
-  const data = await response.json();
-
-  if (!data.results || data.results.length === 0) {
-    throw new Error("Cidade não encontrada.");
-  }
-
-  return data.results[0];
-}
-
-async function getWeather(latitude, longitude) {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code&timezone=auto`;
-
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error("Erro ao buscar clima.");
-  }
-
-  const data = await response.json();
-
-  if (data.error) {
-    throw new Error(data.reason || "Erro ao buscar clima.");
-  }
-
-  return data;
-}
-
-async function searchWeather() {
+async function buscarClima() {
   const city = cityInput.value.trim();
 
-  if (city === "") {
-    showMessage("Digite uma cidade primeiro.");
-    weatherResult.classList.add("hidden");
+  if (!city) {
+    mostrarMensagem("Digite uma cidade primeiro.");
+    weatherBox.classList.add("hidden");
     return;
   }
 
-  showMessage("Buscando clima...");
-  weatherResult.classList.add("hidden");
-
   try {
-    const location = await getCoordinates(city);
-    const weatherData = await getWeather(location.latitude, location.longitude);
+    mostrarLoading(true);
+    mostrarMensagem("");
 
-    cityName.textContent = `${location.name}${location.admin1 ? ", " + location.admin1 : ""}`;
-    weatherDescription.textContent = translateWeatherCode(weatherData.current.weather_code);
-    temperature.textContent = `${Math.round(weatherData.current.temperature_2m)}°C`;
-    windSpeed.textContent = `${Math.round(weatherData.current.wind_speed_10m)} km/h`;
-    apparentTemp.textContent = `${Math.round(weatherData.current.apparent_temperature)}°C`;
-    humidity.textContent = `${weatherData.current.relative_humidity_2m}%`;
+    const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=pt&format=json`;
+    const geoResponse = await fetch(geoUrl);
+    const geoData = await geoResponse.json();
 
-    const rawTime = weatherData.current.time;
-    timeNow.textContent = rawTime ? rawTime.replace("T", " ") : "--";
+    if (!geoData.results || geoData.results.length === 0) {
+      throw new Error("Cidade não encontrada.");
+    }
 
-    showMessage("");
-    weatherResult.classList.remove("hidden");
+    const place = geoData.results[0];
+    const { latitude, longitude, name, admin1, country } = place;
+
+    const weatherUrl =
+      `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}` +
+      `&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m` +
+      `&timezone=auto`;
+
+    const weatherResponse = await fetch(weatherUrl);
+    const weatherData = await weatherResponse.json();
+
+    if (!weatherData.current) {
+      throw new Error("Não foi possível carregar o clima.");
+    }
+
+    const current = weatherData.current;
+    const weatherInfo = getWeatherInfo(current.weather_code);
+
+    cityNameEl.textContent = `${name}${admin1 ? ", " + admin1 : ""}${country ? ", " + country : ""}`;
+    weatherIconEl.textContent = weatherInfo.icon;
+    weatherTextEl.textContent = weatherInfo.text;
+    temperatureEl.textContent = `${Math.round(current.temperature_2m)}°C`;
+    windEl.textContent = `${Math.round(current.wind_speed_10m)} km/h`;
+    feelsLikeEl.textContent = `${Math.round(current.apparent_temperature)}°C`;
+    humidityEl.textContent = `${current.relative_humidity_2m}%`;
+    localTimeEl.textContent = formatarDataHora(weatherData.current.time);
+
+    atualizarBackground(current.weather_code);
+
+    weatherBox.classList.remove("hidden");
   } catch (error) {
-    showMessage(error.message);
-    weatherResult.classList.add("hidden");
+    mostrarMensagem(error.message || "Erro ao buscar o clima.");
+    weatherBox.classList.add("hidden");
+  } finally {
+    mostrarLoading(false);
   }
 }
 
-searchBtn.addEventListener("click", searchWeather);
+function mostrarLoading(show) {
+  loading.classList.toggle("hidden", !show);
+}
 
-cityInput.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    searchWeather();
+function mostrarMensagem(texto) {
+  message.textContent = texto;
+}
+
+function formatarDataHora(dateTimeString) {
+  const data = new Date(dateTimeString);
+
+  if (isNaN(data.getTime())) {
+    return dateTimeString;
   }
-});
+
+  return data.toLocaleString("pt-BR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function getWeatherInfo(code) {
+  const weatherCodes = {
+    0: { text: "Céu limpo", icon: "☀️" },
+    1: { text: "Principalmente limpo", icon: "🌤️" },
+    2: { text: "Parcialmente nublado", icon: "⛅" },
+    3: { text: "Nublado", icon: "☁️" },
+
+    45: { text: "Névoa", icon: "🌫️" },
+    48: { text: "Névoa intensa", icon: "🌫️" },
+
+    51: { text: "Garoa leve", icon: "🌦️" },
+    53: { text: "Garoa moderada", icon: "🌦️" },
+    55: { text: "Garoa forte", icon: "🌧️" },
+
+    56: { text: "Garoa congelante leve", icon: "🌨️" },
+    57: { text: "Garoa congelante forte", icon: "🌨️" },
+
+    61: { text: "Chuva leve", icon: "🌧️" },
+    63: { text: "Chuva moderada", icon: "🌧️" },
+    65: { text: "Chuva forte", icon: "🌧️" },
+
+    66: { text: "Chuva congelante leve", icon: "🌨️" },
+    67: { text: "Chuva congelante forte", icon: "🌨️" },
+
+    71: { text: "Neve leve", icon: "❄️" },
+    73: { text: "Neve moderada", icon: "❄️" },
+    75: { text: "Neve forte", icon: "❄️" },
+    77: { text: "Grãos de neve", icon: "❄️" },
+
+    80: { text: "Pancadas leves", icon: "🌦️" },
+    81: { text: "Pancadas moderadas", icon: "🌧️" },
+    82: { text: "Pancadas fortes", icon: "⛈️" },
+
+    85: { text: "Pancadas de neve leves", icon: "🌨️" },
+    86: { text: "Pancadas de neve fortes", icon: "🌨️" },
+
+    95: { text: "Trovoada", icon: "⛈️" },
+    96: { text: "Trovoada com granizo leve", icon: "⛈️" },
+    99: { text: "Trovoada com granizo forte", icon: "⛈️" },
+  };
+
+  return weatherCodes[code] || { text: "Clima desconhecido", icon: "🌍" };
+}
+
+function atualizarBackground(code) {
+  background.className = "background";
+
+  if (code === 0 || code === 1) {
+    background.classList.add("glow-clear");
+  } else if (code === 2 || code === 3) {
+    background.classList.add("glow-clouds");
+  } else if ([45, 48].includes(code)) {
+    background.classList.add("glow-fog");
+  } else if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) {
+    background.classList.add("glow-rain");
+  } else if ([95, 96, 99].includes(code)) {
+    background.classList.add("glow-storm");
+  } else if ([56, 57, 66, 67, 71, 73, 75, 77, 85, 86].includes(code)) {
+    background.classList.add("glow-snow");
+  } else {
+    background.classList.add("glow-clear");
+  }
+}
