@@ -49,8 +49,7 @@ async function buscarClima() {
 
     const weatherUrl =
       `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}` +
-      `&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m` +
-      `&timezone=auto`;
+      `&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=auto`;
 
     const weatherResponse = await fetch(weatherUrl);
     const weatherData = await weatherResponse.json();
@@ -72,7 +71,6 @@ async function buscarClima() {
     localTimeEl.textContent = formatarDataHora(current.time);
 
     atualizarBackground(current.weather_code);
-
     weatherBox.classList.remove("hidden");
   } catch (error) {
     mostrarMensagem(error.message || "Erro ao buscar o clima.");
