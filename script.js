@@ -71,6 +71,7 @@ async function buscarClima() {
     localTimeEl.textContent = formatarDataHora(current.time);
 
     atualizarBackground(current.weather_code);
+
     weatherBox.classList.remove("hidden");
   } catch (error) {
     mostrarMensagem(error.message || "Erro ao buscar o clima.");
@@ -95,13 +96,15 @@ function formatarDataHora(dateTimeString) {
     return dateTimeString;
   }
 
-  return data.toLocaleString("pt-BR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return data
+    .toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+    .replace(",", " •");
 }
 
 function getWeatherInfo(code) {
