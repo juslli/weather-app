@@ -7,10 +7,10 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="background-glow"></div>
+  <div class="background glow-clear"></div>
 
   <main class="container">
-    <section class="weather-card">
+    <div class="card">
       <h1>Weather App</h1>
       <p class="subtitle">Consulte o clima de qualquer cidade</p>
 
@@ -18,47 +18,50 @@
         <input
           type="text"
           id="cityInput"
-          placeholder="Digite uma cidade..."
+          placeholder="Digite o nome da cidade"
         />
         <button id="searchBtn">Buscar</button>
       </div>
 
-      <div id="message" class="message"></div>
+      <p id="message" class="message"></p>
 
-      <div id="weatherResult" class="weather-result hidden">
-        <div class="top-info">
+      <div id="loading" class="loading hidden">Buscando clima...</div>
+
+      <section id="weatherBox" class="weather-box hidden">
+        <div class="main-weather">
           <div>
             <h2 id="cityName">Cidade</h2>
-            <p id="weatherDescription">Descrição</p>
+            <div class="weather-description">
+              <span id="weatherIcon">☀️</span>
+              <span id="weatherText">Céu limpo</span>
+            </div>
           </div>
-          <div class="temp-box">
-            <span id="temperature">--°C</span>
-          </div>
+          <div class="temperature" id="temperature">24°C</div>
         </div>
 
-        <div class="details">
-          <div class="detail-card">
-            <span class="label">Vento</span>
-            <strong id="windSpeed">-- km/h</strong>
+        <div class="info-grid">
+          <div class="info-card">
+            <span>Vento</span>
+            <strong id="wind">0 km/h</strong>
           </div>
 
-          <div class="detail-card">
-            <span class="label">Sensação</span>
-            <strong id="apparentTemp">--°C</strong>
+          <div class="info-card">
+            <span>Sensação</span>
+            <strong id="feelsLike">0°C</strong>
           </div>
 
-          <div class="detail-card">
-            <span class="label">Umidade</span>
-            <strong id="humidity">--%</strong>
+          <div class="info-card">
+            <span>Umidade</span>
+            <strong id="humidity">0%</strong>
           </div>
 
-          <div class="detail-card">
-            <span class="label">Hora local</span>
-            <strong id="timeNow">--</strong>
+          <div class="info-card">
+            <span>Hora local</span>
+            <strong id="localTime">--:--</strong>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   </main>
 
   <script src="script.js"></script>
