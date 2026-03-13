@@ -53,14 +53,13 @@ function showMessage(text) {
 async function getCoordinates(city) {
   const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=pt&format=json`;
 
-  console.log("URL cidade:", url);
-
   const response = await fetch(url);
-  const data = await response.json();
 
   if (!response.ok) {
     throw new Error("Erro ao buscar cidade.");
   }
+
+  const data = await response.json();
 
   if (!data.results || data.results.length === 0) {
     throw new Error("Cidade não encontrada.");
@@ -70,24 +69,17 @@ async function getCoordinates(city) {
 }
 
 async function getWeather(latitude, longitude) {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code&timezone=auto`;
-
-  console.log("URL clima:", url);
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code&timezone=auto`;
 
   const response = await fetch(url);
-  const rawText = await response.text();
 
-  console.log("Resposta bruta da API:", rawText);
-
-  let data;
-
-  try {
-    data = JSON.parse(rawText);
-  } catch (error) {
-    throw new Error("A API retornou uma resposta inválida.");
+  if (!response.ok) {
+    throw new Error("Erro ao buscar clima.");
   }
 
-  if (!response.ok || data.error) {
+  const data = await response.json();
+
+  if (data.error) {
     throw new Error(data.reason || "Erro ao buscar clima.");
   }
 
@@ -123,7 +115,6 @@ async function searchWeather() {
     showMessage("");
     weatherResult.classList.remove("hidden");
   } catch (error) {
-    console.error("Erro completo:", error);
     showMessage(error.message);
     weatherResult.classList.add("hidden");
   }
